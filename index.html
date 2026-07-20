@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matias Iglesias | Desarrollador Full-Stack</title>
+  <meta name="description" content="Portfolio de Matias Iglesias - Estudiante de Ingenieria en Sistemas y Desarrollador Full-Stack. Proyectos en Next.js, React, NestJS y mas.">
+  <meta name="author" content="Matias Diego Iglesias Mourelle">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Matias Iglesias | Desarrollador Full-Stack">
+  <meta property="og:description" content="Estudiante de Ingenieria en Sistemas en ORT Uruguay. Proyectos reales con Next.js, React, NestJS, TypeScript.">
+  <meta property="og:type" content="website">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Particle Canvas Background -->
+  <canvas id="particles"></canvas>
+
+  <!-- Navigation -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">
+        <span class="logo-bracket">&lt;</span>MI<span class="logo-bracket">/&gt;</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#about" data-section="about">Sobre mi</a></li>
+        <li><a href="#skills" data-section="skills">Skills</a></li>
+        <li><a href="#projects" data-section="projects">Proyectos</a></li>
+        <li><a href="#education" data-section="education">Educacion</a></li>
+        <li><a href="#contact" data-section="contact">Contacto</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Disponible para trabajar</div>
+      <h1 class="hero-name">
+        <span class="hero-greeting">Hola, soy</span>
+        <span class="hero-title-name">Matias Iglesias</span>
+      </h1>
+      <div class="hero-role">
+        <span class="hero-role-static">Desarrollador&nbsp;</span>
+        <span class="hero-role-dynamic" id="typewriter"></span>
+        <span class="cursor">|</span>
+      </div>
+      <p class="hero-desc">
+        Estudiante avanzado de <strong>Ingenieria en Sistemas</strong> en ORT Uruguay.
+        Construyo aplicaciones full-stack con tecnologias modernas,
+        desde MVPs presentados a empresas reales hasta herramientas
+        que usan mis companeros de carrera.
+      </p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">Ver proyectos</a>
+        <a href="#contact" class="btn btn-outline">Contactame</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number" data-target="6">0</span><span class="stat-plus">+</span>
+          <span class="stat-label">Proyectos</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-target="10">0</span><span class="stat-plus">+</span>
+          <span class="stat-label">Tecnologias</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-target="4">0</span>
+          <span class="stat-label">Anio en curso</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="section about">
+    <div class="container">
+      <h2 class="section-title" data-reveal>
+        <span class="section-number">01.</span> Sobre mi
+      </h2>
+      <div class="bento-grid">
+        <div class="bento-card bento-main" data-reveal>
+          <div class="bento-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h3>Quien soy</h3>
+          <p>
+            Soy estudiante avanzado de <strong>Ingenieria en Sistemas</strong> en la Universidad ORT Uruguay,
+            cursando 4to anio. Me apasiona construir software que resuelva problemas reales.
+          </p>
+          <p>
+            Aunque todavia no tengo experiencia laboral formal, mis proyectos personales hablan por si solos:
+            desde un <strong>sistema de ticketing presentado al director de tecnologia de Penarol</strong>,
+            hasta una <strong>plataforma SaaS de gestion de alquileres</strong> con seguridad de nivel produccion.
+          </p>
+          <p>
+            Fui <strong>ayudante de catedra</strong> en ORT (2022-2025), lo que me enseno a comunicar ideas tecnicas
+            con claridad y a entender problemas desde multiples perspectivas.
+          </p>
+        </div>
+
+        <div class="bento-card bento-sm" data-reveal data-delay="100">
+          <div class="bento-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c6 3 6 3 12 0v-5"/></svg>
+          </div>
+          <h3>Educacion</h3>
+          <p class="bento-highlight">ORT Uruguay</p>
+          <p>Ing. en Sistemas - 4to anio</p>
+        </div>
+
+        <div class="bento-card bento-sm" data-reveal data-delay="200">
+          <div class="bento-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h3>Ingles</h3>
+          <p class="bento-highlight">B2 First</p>
+          <p>Cambridge English</p>
+        </div>
+
+        <div class="bento-card bento-sm" data-reveal data-delay="300">
+          <div class="bento-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <h3>Ubicacion</h3>
+          <p class="bento-highlight">Uruguay</p>
+          <p>Montevideo</p>
+        </div>
+
+        <div class="bento-card bento-wide" data-reveal data-delay="150">
+          <div class="bento-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h3>Enfoque</h3>
+          <p>
+            Desarrollo <strong>full-stack</strong> con foco en arquitectura limpia, seguridad y experiencia de usuario.
+            Trabajo con metodologias agiles (<strong>Scrum, Kanban</strong>) y practicas de testing (<strong>TDD, BDD</strong>).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills" class="section skills">
+    <div class="container">
+      <h2 class="section-title" data-reveal>
+        <span class="section-number">02.</span> Tech Stack
+      </h2>
+      <div class="skills-grid">
+        <div class="skill-category" data-reveal>
+          <h3 class="skill-cat-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Lenguajes
+          </h3>
+          <div class="skill-tags">
+            <span class="skill-tag" data-level="advanced">TypeScript</span>
+            <span class="skill-tag" data-level="advanced">JavaScript</span>
+            <span class="skill-tag" data-level="advanced">Java</span>
+            <span class="skill-tag" data-level="intermediate">C#</span>
+            <span class="skill-tag" data-level="intermediate">C++</span>
+            <span class="skill-tag" data-level="intermediate">SQL</span>
+            <span class="skill-tag" data-level="basic">Haskell</span>
+          </div>
+        </div>
+
+        <div class="skill-category" data-reveal data-delay="100">
+          <h3 class="skill-cat-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Frontend
+          </h3>
+          <div class="skill-tags">
+            <span class="skill-tag" data-level="advanced">React</span>
+            <span class="skill-tag" data-level="advanced">Next.js</span>
+            <span class="skill-tag" data-level="advanced">Tailwind CSS</span>
+            <span class="skill-tag" data-level="advanced">HTML/CSS</span>
+            <span class="skill-tag" data-level="intermediate">Angular</span>
+            <span class="skill-tag" data-level="intermediate">Blazor</span>
+            <span class="skill-tag" data-level="intermediate">Framer Motion</span>
+          </div>
+        </div>
+
+        <div class="skill-category" data-reveal data-delay="200">
+          <h3 class="skill-cat-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            Backend & DB
+          </h3>
+          <div class="skill-tags">
+            <span class="skill-tag" data-level="advanced">NestJS</span>
+            <span class="skill-tag" data-level="advanced">Prisma ORM</span>
+            <span class="skill-tag" data-level="advanced">PostgreSQL</span>
+            <span class="skill-tag" data-level="intermediate">REST APIs</span>
+            <span class="skill-tag" data-level="intermediate">SQLite</span>
+            <span class="skill-tag" data-level="intermediate">Oracle SQL</span>
+          </div>
+        </div>
+
+        <div class="skill-category" data-reveal data-delay="300">
+          <h3 class="skill-cat-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            Herramientas & Practicas
+          </h3>
+          <div class="skill-tags">
+            <span class="skill-tag" data-level="advanced">Git/GitHub</span>
+            <span class="skill-tag" data-level="intermediate">Docker</span>
+            <span class="skill-tag" data-level="advanced">Jest</span>
+            <span class="skill-tag" data-level="intermediate">TDD / BDD</span>
+            <span class="skill-tag" data-level="advanced">Scrum</span>
+            <span class="skill-tag" data-level="intermediate">Kanban</span>
+            <span class="skill-tag" data-level="intermediate">Zustand</span>
+            <span class="skill-tag" data-level="intermediate">TanStack Query</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="section projects">
+    <div class="container">
+      <h2 class="section-title" data-reveal>
+        <span class="section-number">03.</span> Proyectos
+      </h2>
+
+      <!-- Project Filter -->
+      <div class="project-filters" data-reveal>
+        <button class="filter-btn active" data-filter="all">Todos</button>
+        <button class="filter-btn" data-filter="personal">Personales</button>
+        <button class="filter-btn" data-filter="academic">Academicos</button>
+      </div>
+
+      <!-- Featured Projects -->
+      <div class="projects-showcase">
+
+        <!-- Tenant -->
+        <article class="project-card project-featured" data-reveal data-category="personal">
+          <div class="project-header">
+            <div class="project-label">Proyecto Destacado</div>
+            <div class="project-links">
+              <a href="https://github.com/MatiasIglesias-sys/Tenant" target="_blank" rel="noopener noreferrer" aria-label="Ver en GitHub">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              </a>
+            </div>
+          </div>
+          <h3 class="project-title">Tenant</h3>
+          <p class="project-subtitle">Plataforma SaaS de gestion de alquileres</p>
+          <p class="project-description">
+            Sistema full-stack completo para el ciclo de vida de alquileres: publicacion de propiedades,
+            postulaciones, contratos, seguimiento de pagos, calculo de IRPF uruguayo,
+            chat entre partes y sistema de resenas con estrellas. Monorepo con arquitectura limpia
+            y seguridad de nivel produccion (Helmet, rate limiting, JWT rotation, bcrypt).
+          </p>
+          <div class="project-features">
+            <span>Roles duales (inquilino/propietario)</span>
+            <span>Multi-moneda (UYU/USD/EUR)</span>
+            <span>Calculo IRPF Cat. I</span>
+            <span>Chat en tiempo real</span>
+            <span>Security hardening</span>
+          </div>
+          <div class="project-tech">
+            <span>Next.js 15</span>
+            <span>React 19</span>
+            <span>NestJS</span>
+            <span>TypeScript</span>
+            <span>Prisma</span>
+            <span>PostgreSQL</span>
+            <span>Docker</span>
+            <span>Tailwind CSS</span>
+          </div>
+        </article>
+
+        <!-- TicketCap -->
+        <article class="project-card project-featured" data-reveal data-category="personal">
+          <div class="project-header">
+            <div class="project-label">Presentado a Penarol</div>
+            <div class="project-links">
+              <a href="https://github.com/MatiasIglesias-sys/TicketCap" target="_blank" rel="noopener noreferrer" aria-label="Ver en GitHub">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              </a>
+            </div>
+          </div>
+          <h3 class="project-title">TicketCap</h3>
+          <p class="project-subtitle">Sistema MVP de venta de entradas deportivas</p>
+          <p class="project-description">
+            MVP de ticketing para eventos deportivos del Club Atletico Penarol.
+            Venta por sectores del estadio, cola virtual para eventos de alta demanda,
+            ventas escalonadas segun categoria de socio y control de acceso via QR.
+            Presentado directamente al director de tecnologia de Penarol.
+          </p>
+          <div class="project-features">
+            <span>Cola virtual</span>
+            <span>Ventas escalonadas por socio</span>
+            <span>Scanner QR</span>
+            <span>Panel admin</span>
+            <span>Suite de tests completa</span>
+            <span>Auditoria de seguridad</span>
+          </div>
+          <div class="project-tech">
+            <span>Next.js</span>
+            <span>TypeScript</span>
+            <span>Prisma</span>
+            <span>SQLite</span>
+            <span>Tailwind CSS</span>
+            <span>Jest</span>
+          </div>
+        </article>
+
+        <!-- OrtGraph -->
+        <article class="project-card" data-reveal data-category="personal">
+          <div class="project-header">
+            <div class="project-label">Herramienta para estudiantes</div>
+            <div class="project-links">
+              <a href="https://github.com/MatiasIglesias-sys/OrtGraph" target="_blank" rel="noopener noreferrer" aria-label="Ver en GitHub">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              </a>
+            </div>
+          </div>
+          <h3 class="project-title">OrtGraph</h3>
+          <p class="project-subtitle">Grafo interactivo de previas de materias</p>
+          <p class="project-description">
+            Herramienta visual interactiva que renderiza todas las materias de Ingenieria en Sistemas
+            (Plan 2019) como nodos conectados por previas. Los estudiantes marcan materias aprobadas
+            y el grafo resalta dinamicamente cuales pueden cursar. Filtrado por anio y panel de detalles.
+          </p>
+          <div class="project-tech">
+            <span>React</span>
+            <span>TypeScript</span>
+            <span>Vite</span>
+            <span>React Flow</span>
+            <span>Zustand</span>
+            <span>Tailwind CSS</span>
+          </div>
+        </article>
+
+        <!-- Academic: Planificacion Semanal -->
+        <article class="project-card" data-reveal data-category="academic">
+          <div class="project-header">
+            <div class="project-label">Ingenieria de Software - ORT</div>
+            <div class="project-links">
+              <a href="https://github.com/IngSoft-FIS-2024-2/proyecto-cagnoli-iglesias" target="_blank" rel="noopener noreferrer" aria-label="Ver en GitHub">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              </a>
+            </div>
+          </div>
+          <h3 class="project-title">Planificacion Semanal</h3>
+          <p class="project-subtitle">Planificador academico semanal</p>
+          <p class="project-description">
+            Aplicacion web para que estudiantes planifiquen sus ejercicios y tareas por materia
+            a lo largo de la semana. Desarrollo siguiendo metodologia de ingenieria de software:
+            elicitacion de requerimientos, mockups, tests unitarios y evaluacion de calidad.
+          </p>
+          <div class="project-tech">
+            <span>JavaScript</span>
+            <span>HTML/CSS</span>
+            <span>Bootstrap 5</span>
+            <span>OOP</span>
+            <span>Unit Testing</span>
+          </div>
+        </article>
+
+        <!-- Academic: Sistema de Entrevistas -->
+        <article class="project-card" data-reveal data-category="academic">
+          <div class="project-header">
+            <div class="project-label">Programacion II - ORT</div>
+          </div>
+          <h3 class="project-title">Sistema de Entrevistas</h3>
+          <p class="project-subtitle">Gestion de postulantes y entrevistas laborales</p>
+          <p class="project-description">
+            Aplicacion de escritorio en Java con interfaz Swing para gestionar postulantes,
+            evaluadores, entrevistas y puestos de trabajo. Implementa patron Observer,
+            persistencia en archivos y ordenamiento por criterios multiples.
+          </p>
+          <div class="project-tech">
+            <span>Java</span>
+            <span>Swing</span>
+            <span>Observer Pattern</span>
+            <span>File I/O</span>
+          </div>
+        </article>
+
+        <!-- Academic: Juego de Tablero -->
+        <article class="project-card" data-reveal data-category="academic">
+          <div class="project-header">
+            <div class="project-label">Programacion II - ORT</div>
+          </div>
+          <h3 class="project-title">Juego de Tablero</h3>
+          <p class="project-subtitle">Juego de mesa con interfaz grafica</p>
+          <p class="project-description">
+            Juego de tablero interactivo desarrollado en Java con interfaz grafica Swing.
+            Implementacion de logica de juego, manejo de turnos y renderizado del tablero.
+          </p>
+          <div class="project-tech">
+            <span>Java</span>
+            <span>Swing GUI</span>
+            <span>OOP</span>
+          </div>
+        </article>
+
+        <!-- Academic: Gestion de Reclamos -->
+        <article class="project-card" data-reveal data-category="academic">
+          <div class="project-header">
+            <div class="project-label">Programacion I - ORT</div>
+          </div>
+          <h3 class="project-title">Gestion de Reclamos</h3>
+          <p class="project-subtitle">Sistema web de reclamos y estadisticas</p>
+          <p class="project-description">
+            Mi primer proyecto: aplicacion web vanilla para gestionar reclamos de empresas.
+            Incluye formularios dinamicos, tablas con ordenamiento, filtros por busqueda,
+            estadisticas en tiempo real y navegacion SPA sin frameworks.
+          </p>
+          <div class="project-tech">
+            <span>JavaScript</span>
+            <span>HTML/CSS</span>
+            <span>DOM API</span>
+            <span>OOP</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Education Section -->
+  <section id="education" class="section education">
+    <div class="container">
+      <h2 class="section-title" data-reveal>
+        <span class="section-number">04.</span> Educacion
+      </h2>
+      <div class="timeline">
+        <div class="timeline-item" data-reveal>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">2019 - Actualidad</div>
+            <h3>Ingenieria en Sistemas</h3>
+            <p class="timeline-place">Universidad ORT Uruguay</p>
+            <p>Cursando 4to anio. Formacion integral en desarrollo de software, arquitectura de sistemas, bases de datos, ingenieria de software y metodologias agiles.</p>
+          </div>
+        </div>
+        <div class="timeline-item" data-reveal data-delay="100">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">2022 - 2025</div>
+            <h3>Ayudante de Catedra</h3>
+            <p class="timeline-place">Universidad ORT Uruguay</p>
+            <p>Asistencia a estudiantes en materias de programacion, resolucion de dudas y apoyo en proyectos academicos.</p>
+          </div>
+        </div>
+        <div class="timeline-item" data-reveal data-delay="200">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">2017 - 2023</div>
+            <h3>B2 First - Cambridge English</h3>
+            <p class="timeline-place">Lennon Institute</p>
+            <p>Certificacion de nivel B2 en ingles, con capacidad para comunicacion profesional fluida.</p>
+          </div>
+        </div>
+        <div class="timeline-item" data-reveal data-delay="300">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">2017 - 2022</div>
+            <h3>Bachiller en Ingenieria</h3>
+            <p class="timeline-place">Colegio y Liceo San Jose de la Providencia</p>
+            <p>Formacion preuniversitaria con orientacion en ingenieria.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section contact">
+    <div class="container">
+      <h2 class="section-title" data-reveal>
+        <span class="section-number">05.</span> Contacto
+      </h2>
+      <div class="contact-content" data-reveal>
+        <p class="contact-text">
+          Estoy buscando mi primera experiencia laboral en desarrollo de software.
+          Si tenes un proyecto interesante o una oportunidad, me encantaria conversar.
+        </p>
+        <div class="contact-cards">
+          <a href="mailto:matias.iglesiasd@gmail.com" class="contact-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>matias.iglesiasd@gmail.com</span>
+          </a>
+          <a href="https://github.com/MatiasIglesias-sys" target="_blank" rel="noopener noreferrer" class="contact-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            <span>MatiasIglesias-sys</span>
+          </a>
+          <a href="tel:+59893512358" class="contact-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>+598 93 512 358</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>Disenado y desarrollado por <strong>Matias Iglesias</strong></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
