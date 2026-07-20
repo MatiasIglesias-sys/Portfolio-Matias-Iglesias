@@ -283,7 +283,7 @@
     sfx.laser = new Audio('assets/sounds/laser.wav');
     sfx.laser.volume = 0.12;
     sfx.explosion = new Audio('assets/sounds/explosion.wav');
-    sfx.explosion.volume = 0.15;
+    sfx.explosion.volume = 0.08;
     sfx.ready = true;
   }
 
@@ -294,6 +294,125 @@
     const clone = src.cloneNode();
     clone.volume = src.volume;
     clone.play().catch(() => {});
+  }
+
+  // ═══════════════════════════════════════════
+  // 8-BIT PIXEL EXPLOSION (canvas-drawn)
+  // ═══════════════════════════════════════════
+
+  const pixelExplosions = [];
+
+  function spawnPixelExplosion(x, y, size) {
+    const totalFrames = 10;
+    const pixelSize = Math.max(4, Math.floor(size / 12));
+    pixelExplosions.push({
+      x, y, size, pixelSize,
+      frame: 0,
+      totalFrames,
+      frameDuration: 55, // ms per frame
+      lastFrameTime: performance.now(),
+    });
+  }
+
+  function drawPixelExplosion(exp) {
+    const t = exp.frame / exp.totalFrames; // 0 → 1
+    const px = exp.pixelSize;
+    const cx = exp.x;
+    const cy = exp.y;
+    const maxR = exp.size * 1.2;
+
+    // 8-bit color palette: white core → yellow → orange → red → dark red → gone
+    const colors = [
+      '#ffffff',  // white hot core
+      '#ffffa0',  // bright yellow
+      '#ffdd44',  // yellow
+      '#ffaa00',  // orange
+      '#ff6600',  // deep orange
+      '#ee3300',  // red-orange
+      '#cc1100',  // red
+      '#880000',  // dark red
+    ];
+
+    ctx.save();
+
+    // Draw expanding pixel rings
+    const rings = 4;
+    for (let ring = 0; ring < rings; ring++) {
+      const ringDelay = ring * 0.12;
+      const ringT = Math.max(0, Math.min(1, (t - ringDelay) / (1 - ringDelay)));
+      if (ringT <= 0) continue;
+
+      const radius = ringT * maxR * (0.3 + ring * 0.25);
+      const alpha = Math.max(0, 1 - ringT * 1.1);
+      if (alpha <= 0) continue;
+
+      // Pick color based on ring and time
+      const colorIdx = Math.min(colors.length - 1, Math.floor((ringT * 0.6 + ring * 0.15) * colors.length));
+
+      ctx.globalAlpha = alpha;
+
+      // Draw pixelated circle for this ring
+      const gridR = Math.ceil(radius / px);
+      for (let gx = -gridR; gx <= gridR; gx++) {
+        for (let gy = -gridR; gy <= gridR; gy++) {
+          const d = Math.sqrt(gx * gx + gy * gy) * px;
+          const thickness = px * (2.5 - ring * 0.4);
+
+          // Ring shape: only draw pixels near the ring edge
+          if (d > radius - thickness && d < radius + thickness * 0.5) {
+            // Add some pixel randomness for 8-bit feel
+            if (Math.random() > 0.3 + ringT * 0.4) continue;
+
+            // Vary color slightly per pixel
+            const ci = Math.min(colors.length - 1, Math.max(0, colorIdx + Math.floor(rand(-1, 2))));
+            ctx.fillStyle = colors[ci];
+            ctx.fillRect(
+              cx + gx * px - px / 2,
+              cy + gy * px - px / 2,
+              px, px
+            );
+          }
+        }
+      }
+    }
+
+    // Bright core (shrinks over time)
+    const coreSize = Math.max(0, (1 - t * 1.5)) * maxR * 0.35;
+    if (coreSize > 0) {
+      ctx.globalAlpha = Math.max(0, 1 - t * 1.8);
+      const coreGridR = Math.ceil(coreSize / px);
+      for (let gx = -coreGridR; gx <= coreGridR; gx++) {
+        for (let gy = -coreGridR; gy <= coreGridR; gy++) {
+          const d = Math.sqrt(gx * gx + gy * gy) * px;
+          if (d < coreSize) {
+            const ci = d < coreSize * 0.4 ? 0 : d < coreSize * 0.7 ? 1 : 2;
+            ctx.fillStyle = colors[ci];
+            ctx.fillRect(
+              cx + gx * px - px / 2,
+              cy + gy * px - px / 2,
+              px, px
+            );
+          }
+        }
+      }
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function updatePixelExplosions() {
+    const now = performance.now();
+    for (let i = pixelExplosions.length - 1; i >= 0; i--) {
+      const exp = pixelExplosions[i];
+      if (now - exp.lastFrameTime >= exp.frameDuration) {
+        exp.frame++;
+        exp.lastFrameTime = now;
+      }
+      if (exp.frame >= exp.totalFrames) {
+        pixelExplosions.splice(i, 1);
+      }
+    }
   }
 
   // ═══════════════════════════════════════════
@@ -547,6 +666,7 @@
       }
 
       ripples.push(new Ripple(this.x, screenY, [255, 200, 100]));
+      spawnPixelExplosion(this.x, screenY, this.r * 2.5);
     }
   }
 
@@ -900,6 +1020,10 @@
       ctx.fill();
       ctx.shadowBlur = 0;
     }
+
+    // 8-bit pixel explosions
+    updatePixelExplosions();
+    for (const exp of pixelExplosions) drawPixelExplosion(exp);
 
     // Engine trail
     for (const p of trail) {
