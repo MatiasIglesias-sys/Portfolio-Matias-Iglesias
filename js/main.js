@@ -309,7 +309,7 @@
       x, y, size, pixelSize,
       frame: 0,
       totalFrames,
-      frameDuration: 55, // ms per frame
+      frameDuration: 42, // ms per frame
       lastFrameTime: performance.now(),
     });
   }
@@ -666,7 +666,7 @@
       }
 
       ripples.push(new Ripple(this.x, screenY, [255, 200, 100]));
-      spawnPixelExplosion(this.x, screenY, this.r * 2.5);
+      spawnPixelExplosion(this.x, screenY, this.r * 2);
     }
   }
 
