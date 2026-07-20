@@ -115,97 +115,24 @@ body {
   transform: translateY(0);
 }
 
-/* ─── Aurora Background ──────────────────────── */
-.aurora-bg {
+/* ─── Space Background ───────────────────────── */
+#playground {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   z-index: 0;
   pointer-events: none;
-  overflow: hidden;
+  background: #020209;
+  cursor: none;
 }
 
-.aurora-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.4;
-  will-change: transform;
+body {
+  cursor: none !important;
 }
-
-.blob-1 {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(0, 212, 255, 0.35) 0%, transparent 70%);
-  top: -15%;
-  left: -10%;
-  animation: drift-1 18s ease-in-out infinite;
-}
-
-.blob-2 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%);
-  top: 30%;
-  right: -8%;
-  animation: drift-2 22s ease-in-out infinite;
-}
-
-.blob-3 {
-  width: 450px;
-  height: 450px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
-  bottom: -10%;
-  left: 25%;
-  animation: drift-3 20s ease-in-out infinite;
-}
-
-.blob-4 {
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
-  top: 50%;
-  left: 50%;
-  animation: drift-4 25s ease-in-out infinite;
-}
-
-.noise-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 128px 128px;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-}
-
-@keyframes drift-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(80px, 60px) scale(1.1); }
-  50% { transform: translate(30px, 120px) scale(0.95); }
-  75% { transform: translate(-50px, 40px) scale(1.05); }
-}
-
-@keyframes drift-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(-70px, 80px) scale(1.08); }
-  50% { transform: translate(-120px, 20px) scale(0.9); }
-  75% { transform: translate(-30px, -60px) scale(1.12); }
-}
-
-@keyframes drift-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(60px, -50px) scale(1.15); }
-  50% { transform: translate(-40px, -90px) scale(0.92); }
-  75% { transform: translate(90px, -30px) scale(1.05); }
-}
-
-@keyframes drift-4 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  33% { transform: translate(-100px, 70px) scale(1.2) rotate(60deg); }
-  66% { transform: translate(60px, -80px) scale(0.85) rotate(120deg); }
+body *, body *::before, body *::after {
+  cursor: none !important;
 }
 
 /* ─── Navbar ─────────────────────────────────── */
