@@ -8,26 +8,38 @@
   const canvas = document.getElementById('playground');
   const ctx = canvas.getContext('2d');
 
+  // ── Deteccion de dispositivo ──
+  // Touch: la nave se pilotea con toques en vez de seguir al cursor.
+  const IS_TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  const IS_SMALL = window.innerWidth < 900;
+  // En celular bajamos densidad de particulas y efectos caros (shadowBlur)
+  const LOW_POWER = IS_TOUCH || IS_SMALL;
+
   // ── CONFIG ──
   const CFG = {
     bg: '#020209',
-    starCount: 220,
-    nebulaCount: 4,
-    meteorCount: 50,
+    starCount: LOW_POWER ? 90 : 220,
+    nebulaCount: LOW_POWER ? 3 : 4,
+    meteorCount: LOW_POWER ? 26 : 50, // tope; el real se calcula por densidad
     meteorSpeedMin: 0.3,
     meteorSpeedMax: 0.9,
-    dodgeRadius: 160,
+    dodgeRadius: LOW_POWER ? 110 : 160,
     dodgeForce: 1.2,
-    laserSpeed: 14,
+    laserSpeed: LOW_POWER ? 11 : 14,
     laserColor: '#00ffcc',
-    trailMax: 150,
-    trailRate: 3,
-    shipSize: 18,
+    trailMax: LOW_POWER ? 55 : 150,
+    trailRate: LOW_POWER ? 2 : 3,
+    shipSize: LOW_POWER ? 16 : 18,
     engineGlow: '#00d4ff',
+    glow: !LOW_POWER,          // shadowBlur: muy caro en GPU movil
+    maxDpr: LOW_POWER ? 1.5 : 2,
+    // Suavizado del vuelo de la nave hacia el punto tocado
+    shipEase: 0.09,
   };
 
   let W, H, dpr, pageH;
-  let mouse = { x: -9999, y: -9999, px: -9999, py: -9999, angle: 0 };
+  let mouse = { x: -9999, y: -9999, px: -9999, py: -9999, angle: 0, tx: null, ty: null };
+  let running = true;
   let stars = [];
   let nebulae = [];
   let meteors = [];
@@ -43,7 +55,7 @@
   function lerp(a, b, t) { return a + (b - a) * t; }
 
   function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, CFG.maxDpr);
     W = window.innerWidth;
     H = window.innerHeight;
     pageH = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, H);
@@ -304,7 +316,10 @@
 
   function spawnPixelExplosion(x, y, size) {
     const totalFrames = 10;
-    const pixelSize = Math.max(4, Math.floor(size / 12));
+    // Pixeles mas grandes en movil = menos iteraciones por frame
+    const pixelSize = LOW_POWER
+      ? Math.max(7, Math.floor(size / 7))
+      : Math.max(4, Math.floor(size / 12));
     pixelExplosions.push({
       x, y, size, pixelSize,
       frame: 0,
@@ -813,8 +828,10 @@
       ctx.beginPath();
       ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(0, 255, 220, ${this.life})`;
-      ctx.shadowColor = CFG.laserColor;
-      ctx.shadowBlur = 15;
+      if (CFG.glow) {
+        ctx.shadowColor = CFG.laserColor;
+        ctx.shadowBlur = 15;
+      }
       ctx.fill();
 
       // Elongated line in direction
@@ -926,13 +943,27 @@
     createStars();
     createNebulae();
     createCelestials();
+
+    // Los meteoritos se reparten sobre TODA la altura de la pagina.
+    // En celular la pagina es mucho mas alta (todo apilado), asi que un
+    // numero fijo dejaria la pantalla casi vacia: se calcula por densidad.
+    const screens = Math.max(1, pageH / H);
+    const perScreen = LOW_POWER ? 3.2 : 7.5;
+    const count = Math.round(
+      Math.min(CFG.meteorCount, Math.max(8, perScreen * screens))
+    );
+
     meteors = [];
-    for (let i = 0; i < CFG.meteorCount; i++) {
+    for (let i = 0; i < count; i++) {
       meteors.push(new Meteor(false));
     }
   }
 
   function animate() {
+    if (!running) return;
+
+    updateShipTarget();
+
     ctx.fillStyle = CFG.bg;
     ctx.fillRect(0, 0, W, H);
 
@@ -1012,8 +1043,10 @@
       ctx.arc(s.x, s.y, s.r * s.life, 0, Math.PI * 2);
       if (s.hot) {
         ctx.fillStyle = `rgba(255, ${Math.floor(180 * s.life)}, ${Math.floor(50 * s.life)}, ${s.life})`;
-        ctx.shadowColor = 'rgba(255, 150, 50, 0.5)';
-        ctx.shadowBlur = 6;
+        if (CFG.glow) {
+          ctx.shadowColor = 'rgba(255, 150, 50, 0.5)';
+          ctx.shadowBlur = 6;
+        }
       } else {
         ctx.fillStyle = `rgba(255, ${Math.floor(220 * s.life)}, ${Math.floor(150 * s.life)}, ${s.life * 0.7})`;
       }
@@ -1049,69 +1082,179 @@
     requestAnimationFrame(animate);
   }
 
-  // ── Events ──
+  // ═══════════════════════════════════════════
+  // CONTROLES
+  // ═══════════════════════════════════════════
 
-  document.addEventListener('mousemove', (e) => {
-    if (!shipVisible) shipVisible = true;
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-  });
+  function clamp(v, min, max) { return v < min ? min : v > max ? max : v; }
 
-  document.addEventListener('mousedown', (e) => {
-    initAudio(); // Unlock audio on first user interaction
-    // Shoot laser from ship nose in ship direction
-    if (shipVisible) {
-      const noseX = mouse.x + Math.cos(mouse.angle) * CFG.shipSize;
-      const noseY = mouse.y + Math.sin(mouse.angle) * CFG.shipSize;
-      lasers.push(new Laser(noseX, noseY, mouse.angle));
-      // Slight spread
-      lasers.push(new Laser(noseX, noseY, mouse.angle + rand(-0.15, 0.15)));
-      playSound('laser');
+  // En modo touch la nave vuela suavemente hacia el ultimo punto tocado
+  function updateShipTarget() {
+    if (mouse.tx === null) return;
+    const dx = mouse.tx - mouse.x;
+    const dy = mouse.ty - mouse.y;
+    if (Math.abs(dx) < 0.6 && Math.abs(dy) < 0.6) {
+      mouse.x = mouse.tx;
+      mouse.y = mouse.ty;
+      return;
     }
-    ripples.push(new Ripple(e.clientX, e.clientY));
-  });
+    mouse.x += dx * CFG.shipEase;
+    mouse.y += dy * CFG.shipEase;
+  }
 
-  document.addEventListener('touchstart', (e) => {
-    initAudio();
-    const t = e.touches[0];
-    if (!shipVisible) shipVisible = true;
-    mouse.x = t.clientX;
-    mouse.y = t.clientY;
-    lasers.push(new Laser(mouse.x, mouse.y, rand(0, Math.PI * 2)));
-    lasers.push(new Laser(mouse.x, mouse.y, rand(0, Math.PI * 2)));
-    ripples.push(new Ripple(mouse.x, mouse.y));
+  // Dispara desde la nave hacia (x, y) y la manda volando en esa direccion
+  function fireAt(x, y) {
+    const dx = x - mouse.x;
+    const dy = y - mouse.y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    if (d < 1) return;
+
+    const angle = Math.atan2(dy, dx);
+    mouse.angle = angle; // apunta antes de disparar: el tiro sale derecho al toque
+
+    const noseX = mouse.x + Math.cos(angle) * CFG.shipSize;
+    const noseY = mouse.y + Math.sin(angle) * CFG.shipSize;
+    lasers.push(new Laser(noseX, noseY, angle));
+    lasers.push(new Laser(noseX, noseY, angle + rand(-0.1, 0.1)));
     playSound('laser');
-  }, { passive: true });
+    ripples.push(new Ripple(x, y));
 
-  document.addEventListener('touchmove', (e) => {
-    const t = e.touches[0];
-    mouse.x = t.clientX;
-    mouse.y = t.clientY;
-  }, { passive: true });
+    // Se acerca al punto pero frena antes, asi el dedo no tapa la nave
+    const stop = Math.max(0, d - CFG.shipSize * 3.5);
+    mouse.tx = clamp(mouse.x + Math.cos(angle) * stop, 24, W - 24);
+    mouse.ty = clamp(mouse.y + Math.sin(angle) * stop, 24, H - 24);
+  }
 
-  document.addEventListener('touchend', () => {
-    mouse.x = -9999; mouse.y = -9999;
-    shipVisible = false;
-  });
+  // ── Mouse (solo en dispositivos con puntero fino) ──
+  if (!IS_TOUCH) {
+    document.addEventListener('mousemove', (e) => {
+      if (!shipVisible) shipVisible = true;
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
 
-  document.addEventListener('mouseleave', () => {
-    mouse.x = -9999; mouse.y = -9999;
-    shipVisible = false;
-  });
+    document.addEventListener('mousedown', (e) => {
+      initAudio(); // Desbloquea el audio en la primera interaccion
+      if (shipVisible) {
+        const noseX = mouse.x + Math.cos(mouse.angle) * CFG.shipSize;
+        const noseY = mouse.y + Math.sin(mouse.angle) * CFG.shipSize;
+        lasers.push(new Laser(noseX, noseY, mouse.angle));
+        lasers.push(new Laser(noseX, noseY, mouse.angle + rand(-0.15, 0.15)));
+        playSound('laser');
+      }
+      ripples.push(new Ripple(e.clientX, e.clientY));
+    });
 
-  document.addEventListener('mouseenter', () => {
-    shipVisible = true;
-  });
+    document.addEventListener('mouseleave', () => {
+      mouse.x = -9999; mouse.y = -9999;
+      shipVisible = false;
+    });
+
+    document.addEventListener('mouseenter', () => {
+      shipVisible = true;
+    });
+  }
+
+  // ── Touch ──
+  // La nave NO sigue al dedo (tapaba todo y peleaba con el scroll):
+  // se dispara y vuela hacia donde tocaste, y solo si fue un tap real.
+  if (IS_TOUCH) {
+    let touchStart = null;
+
+    const isInteractive = (el) =>
+      !!(el && el.closest && el.closest('a, button, input, textarea, select, label, .nav-links'));
+
+    document.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) { touchStart = null; return; }
+      const t = e.touches[0];
+      touchStart = {
+        x: t.clientX,
+        y: t.clientY,
+        time: performance.now(),
+        interactive: isInteractive(e.target),
+      };
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      const start = touchStart;
+      touchStart = null;
+      if (!start || start.interactive) return;
+
+      const t = e.changedTouches[0];
+      const moved = Math.abs(t.clientX - start.x) + Math.abs(t.clientY - start.y);
+      const elapsed = performance.now() - start.time;
+
+      // Descarta scroll y pulsaciones largas: solo dispara con un tap limpio
+      if (moved > 16 || elapsed > 450) return;
+
+      initAudio();
+      fireAt(t.clientX, t.clientY);
+    }, { passive: true });
+
+    document.addEventListener('touchcancel', () => { touchStart = null; }, { passive: true });
+  }
+
+  // ── Resize ──
+  // En celular la barra de URL dispara resize al scrollear: si se regenera
+  // todo en cada uno, la escena parpadea y se traba. Solo el ancho importa.
+  let lastW = window.innerWidth;
+  let resizeTimer = null;
 
   window.addEventListener('resize', () => {
-    resize();
-    createStars();
-    createNebulae();
-    createCelestials();
+    const widthChanged = window.innerWidth !== lastW;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      resize();
+      if (widthChanged) {
+        lastW = window.innerWidth;
+        createStars();
+        createNebulae();
+        createCelestials();
+      }
+      if (IS_TOUCH) {
+        mouse.x = clamp(mouse.x, 24, W - 24);
+        mouse.y = clamp(mouse.y, 24, H - 24);
+        mouse.tx = clamp(mouse.tx, 24, W - 24);
+        mouse.ty = clamp(mouse.ty, 24, H - 24);
+      }
+    }, 150);
+  });
+
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      resize();
+      lastW = window.innerWidth;
+      createStars();
+      createNebulae();
+      createCelestials();
+    }, 250);
+  });
+
+  // Pausa la animacion con la pestaña en segundo plano (bateria en celular)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      running = false;
+    } else if (!running) {
+      running = true;
+      requestAnimationFrame(animate);
+    }
   });
 
   resize();
   init();
+
+  if (IS_TOUCH) {
+    // La nave arranca visible y estacionada abajo al centro
+    mouse.x = W * 0.5;
+    mouse.y = H * 0.72;
+    mouse.px = mouse.x;
+    mouse.py = mouse.y;
+    mouse.tx = mouse.x;
+    mouse.ty = mouse.y;
+    mouse.angle = -Math.PI / 2;
+    shipVisible = true;
+  }
+
   animate();
 })();
 
@@ -1231,19 +1374,109 @@
 
   sections.forEach(s => sectionObserver.observe(s));
 
-  // Mobile toggle
+  // ── Menu mobile ──
+  const backdrop = document.createElement('div');
+  backdrop.className = 'nav-backdrop';
+  document.body.appendChild(backdrop);
+
+  function setMenu(open) {
+    navMenu.classList.toggle('open', open);
+    toggle.classList.toggle('open', open);
+    backdrop.classList.toggle('show', open);
+    document.body.classList.toggle('nav-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+
   toggle.addEventListener('click', () => {
-    const isOpen = navMenu.classList.toggle('open');
-    toggle.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', isOpen);
+    setMenu(!navMenu.classList.contains('open'));
   });
 
-  // Close mobile menu on link click
+  backdrop.addEventListener('click', () => setMenu(false));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setMenu(false);
+  });
+
+  // Cierra al elegir una seccion
   navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      navMenu.classList.remove('open');
-      toggle.classList.remove('open');
-      toggle.setAttribute('aria-expanded', 'false');
+    link.addEventListener('click', () => setMenu(false));
+  });
+
+  // Si se agranda la pantalla con el menu abierto, queda el scroll trabado
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) setMenu(false);
+  });
+})();
+
+
+// ─── Copiar al portapapeles ─────────────────────────────────────
+(function initCopy() {
+  const toast = document.getElementById('toast');
+  let toastTimer = null;
+
+  function showToast(msg) {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  // navigator.clipboard necesita HTTPS/localhost: fallback para file:// y navegadores viejos
+  function legacyCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length); // iOS
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (_) { /* cae al fallback */ }
+    }
+    return legacyCopy(text);
+  }
+
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const text = btn.dataset.copy;
+      if (!text) return;
+
+      const ok = await copyText(text);
+
+      if (ok) {
+        btn.classList.add('copied');
+        setTimeout(() => btn.classList.remove('copied'), 1600);
+        showToast('Copiado: ' + text);
+      } else {
+        showToast('No se pudo copiar, seleccionalo a mano');
+      }
+    });
+  });
+
+  // Doble click sobre el dato: selecciona todo el valor completo
+  document.querySelectorAll('.contact-value').forEach(el => {
+    el.addEventListener('dblclick', () => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
     });
   });
 })();
@@ -1290,6 +1523,13 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       });
     });
   });
+})();
+
+
+// ─── Año del copyright (siempre actualizado) ────────────────────
+(function initYear() {
+  const el = document.getElementById('year');
+  if (el) el.textContent = new Date().getFullYear();
 })();
 
 

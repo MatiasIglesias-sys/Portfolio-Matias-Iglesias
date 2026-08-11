@@ -54,6 +54,24 @@ body {
   color: var(--text-primary);
   line-height: 1.7;
   overflow-x: hidden;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Bloquea el scroll de fondo con el menu mobile abierto */
+body.nav-open {
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+img, svg, canvas {
+  max-width: 100%;
 }
 
 ::selection {
@@ -128,11 +146,22 @@ body {
   cursor: none;
 }
 
-body {
-  cursor: none !important;
-}
-body *, body *::before, body *::after {
-  cursor: none !important;
+/* La nave reemplaza al cursor solo en dispositivos con mouse real.
+   En touch no aplica, y el texto seleccionable mantiene su caret
+   para que se pueda copiar sin pelear con el cursor invisible. */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none !important;
+  }
+  body *, body *::before, body *::after {
+    cursor: none !important;
+  }
+
+  .contact-value,
+  .selectable,
+  .selectable * {
+    cursor: text !important;
+  }
 }
 
 /* ─── Navbar ─────────────────────────────────── */
@@ -200,6 +229,28 @@ body *, body *::before, body *::after {
   background: rgba(0, 212, 255, 0.08);
 }
 
+/* Capa oscura detras del menu mobile */
+.nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 2, 9, 0.6);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+.nav-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+  /* Evita que el scroll "atraviese" al fondo en iOS con el menu abierto */
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
 .nav-toggle {
   display: none;
   flex-direction: column;
@@ -233,6 +284,7 @@ body *, body *::before, body *::after {
 /* ─── Hero ───────────────────────────────────── */
 .hero {
   min-height: 100vh;
+  min-height: 100svh; /* evita el salto por la barra de URL en celular */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -303,10 +355,11 @@ body *, body *::before, body *::after {
 .hero-title-name {
   display: block;
   font-family: var(--font-heading);
-  font-size: clamp(2.8rem, 7vw, 4.5rem);
+  font-size: clamp(2.1rem, 8vw, 4.5rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.1;
+  overflow-wrap: break-word;
   background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -902,21 +955,25 @@ body *, body *::before, body *::after {
 .contact-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px 24px;
+  gap: 8px;
+  padding: 8px 10px 8px 20px;
   background: var(--bg-card);
   border: 1px solid var(--border-card);
   border-radius: 16px;
   color: var(--text-secondary);
-  text-decoration: none;
-  transition: all 0.3s var(--ease-out);
+  transition: border-color 0.3s var(--ease-out), background 0.3s var(--ease-out), transform 0.3s var(--ease-out);
 }
 
-.contact-card:hover {
-  border-color: var(--border-card-hover);
-  background: var(--bg-card-hover);
-  color: var(--accent-cyan);
-  transform: translateX(8px);
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+  padding: 12px 4px;
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s var(--ease-out);
 }
 
 .contact-card svg {
@@ -924,9 +981,119 @@ body *, body *::before, body *::after {
   color: var(--accent-cyan);
 }
 
-.contact-card span {
+.contact-value {
   font-size: 0.95rem;
   font-weight: 500;
+  overflow-wrap: anywhere;
+  /* Seleccionable para poder copiar a mano tambien */
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ─── Boton copiar ───────────────────────────── */
+.copy-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-card);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.copy-btn .icon-check {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.6);
+  color: var(--accent-emerald);
+  transition: all 0.2s var(--ease-spring);
+}
+
+.copy-btn .icon-copy {
+  transition: all 0.2s var(--ease-spring);
+}
+
+.copy-btn.copied {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.copy-btn.copied .icon-copy {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.copy-btn.copied .icon-check {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.contact-hint {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ─── Toast ──────────────────────────────────── */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translate(-50%, 20px);
+  z-index: 2000;
+  padding: 12px 22px;
+  border-radius: 100px;
+  background: rgba(15, 15, 26, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s var(--ease-out);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Hover solo donde hay mouse: en touch estos estados se "pegan" al tocar */
+@media (hover: hover) {
+  .contact-card:hover {
+    border-color: var(--border-card-hover);
+    background: var(--bg-card-hover);
+    color: var(--accent-cyan);
+    transform: translateX(8px);
+  }
+
+  .copy-btn:hover {
+    color: var(--accent-cyan);
+    border-color: rgba(0, 212, 255, 0.3);
+    background: rgba(0, 212, 255, 0.08);
+  }
+}
+
+.copy-btn:active {
+  transform: scale(0.92);
+}
+
+.copy-btn:focus-visible,
+.contact-link:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+  border-radius: 10px;
 }
 
 /* ─── Footer ─────────────────────────────────── */
@@ -947,7 +1114,31 @@ body *, body *::before, body *::after {
   color: var(--text-secondary);
 }
 
+.footer-copy {
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-card);
+  display: inline-block;
+  font-size: 0.8rem !important;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
 /* ─── Responsive ─────────────────────────────── */
+
+/* En touch el :hover queda "trabado" tras tocar: sin desplazamientos */
+@media (hover: none) {
+  .bento-card:hover,
+  .project-card:hover,
+  .skill-tag:hover,
+  .btn-primary:hover,
+  .btn-outline:hover,
+  .contact-card:hover,
+  .project-links a:hover {
+    transform: none;
+  }
+}
+
 @media (max-width: 900px) {
   .bento-grid {
     grid-template-columns: 1fr 1fr;
@@ -979,22 +1170,32 @@ body *, body *::before, body *::after {
 }
 
 @media (max-width: 768px) {
+  :root {
+    --nav-height: 64px;
+  }
+
   .section {
     padding: 80px 0;
+  }
+
+  .section-title {
+    margin-bottom: 40px;
   }
 
   .nav-links {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 75%;
+    width: 78%;
     max-width: 320px;
     height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
     background: rgba(10, 10, 15, 0.97);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     flex-direction: column;
-    padding: calc(var(--nav-height) + 20px) 32px 32px;
+    padding: calc(var(--nav-height) + 20px) 28px 32px;
     gap: 4px;
     border-left: 1px solid var(--border-card);
     transition: right 0.4s var(--ease-out);
@@ -1005,29 +1206,105 @@ body *, body *::before, body *::after {
   }
 
   .nav-links a {
+    display: block;
     font-size: 1.05rem;
     padding: 14px 16px;
   }
 
   .nav-toggle {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .nav-backdrop {
+    display: block;
+  }
+
+  .hero {
+    padding: calc(var(--nav-height) + 24px) 20px 80px;
+  }
+
+  .hero-desc {
+    font-size: 1rem;
   }
 
   .hero-stats {
-    gap: 32px;
+    gap: 28px;
   }
 
   .hero-actions {
     flex-direction: column;
+    gap: 12px;
+    margin-bottom: 44px;
   }
 
   .btn {
+    width: 100%;
     text-align: center;
     justify-content: center;
+  }
+
+  .bento-card,
+  .skill-category,
+  .project-card {
+    padding: 24px 20px;
+  }
+
+  .timeline {
+    padding-left: 28px;
+  }
+
+  .timeline::before {
+    left: 5px;
+  }
+
+  .timeline-dot {
+    left: -27px;
+    width: 12px;
+    height: 12px;
+    border-width: 2px;
+  }
+
+  .timeline-item {
+    margin-bottom: 28px;
+  }
+
+  .timeline-content {
+    padding: 20px;
+  }
+
+  .contact-text {
+    font-size: 1rem;
+    margin-bottom: 28px;
+  }
+
+  .contact-cards {
+    text-align: left;
+  }
+
+  .project-title {
+    font-size: 1.3rem;
+  }
+
+  .toast {
+    bottom: 20px;
+    max-width: calc(100vw - 40px);
+    text-align: center;
   }
 }
 
 @media (max-width: 540px) {
+  .container {
+    padding: 0 18px;
+  }
+
+  .section {
+    padding: 64px 0;
+  }
+
   .bento-grid {
     grid-template-columns: 1fr;
   }
@@ -1038,12 +1315,99 @@ body *, body *::before, body *::after {
     grid-column: span 1;
   }
 
+  /* Grilla de 3 en linea: en columna el hero quedaba larguisimo */
   .hero-stats {
-    flex-direction: column;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
   }
 
-  .section-title {
-    margin-bottom: 40px;
+  .stat-number {
+    font-size: 1.7rem;
+  }
+
+  .stat-plus {
+    font-size: 1.15rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .hero-badge {
+    font-size: 0.75rem;
+    margin-bottom: 20px;
+  }
+
+  .scroll-indicator {
+    display: none;
+  }
+
+  .project-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .project-label {
+    font-size: 0.68rem;
+  }
+
+  .contact-card {
+    padding: 6px 8px 6px 14px;
+    gap: 6px;
+  }
+
+  .contact-link {
+    gap: 12px;
+    padding: 12px 0;
+  }
+
+  .contact-value {
+    font-size: 0.88rem;
+  }
+
+  .contact-card svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .copy-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .copy-btn svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .skill-category {
+    padding: 22px 18px;
+  }
+
+  .skill-tag {
+    font-size: 0.8rem;
+    padding: 5px 11px;
+  }
+
+  .project-tech span,
+  .project-features span {
+    font-size: 0.7rem;
+  }
+}
+
+/* ─── Accesibilidad: menos movimiento ────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
   }
 }
