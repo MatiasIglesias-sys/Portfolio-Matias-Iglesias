@@ -146,6 +146,19 @@ img, svg, canvas {
   cursor: none;
 }
 
+/* La nave hace de cursor, asi que va por encima de todo (navbar incluido).
+   Sin fondo propio: solo dibuja la nave sobre el resto de la pagina. */
+#ship-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 3000;
+  pointer-events: none;
+  cursor: none;
+}
+
 /* La nave reemplaza al cursor solo en dispositivos con mouse real.
    En touch no aplica, y el texto seleccionable mantiene su caret
    para que se pueda copiar sin pelear con el cursor invisible. */
@@ -209,6 +222,60 @@ img, svg, canvas {
   display: flex;
   list-style: none;
   gap: 8px;
+  /* Empuja el menu contra las acciones de la derecha */
+  margin-left: auto;
+  margin-right: 18px;
+}
+
+/* ─── Switch de idioma ───────────────────────── */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Se corre un poco mas alla del padding del container, contra el borde */
+  margin-right: -12px;
+  /* Por encima del panel del menu mobile, que es fixed y taparia los botones */
+  position: relative;
+  z-index: 1001;
+}
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.lang-switch:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-card-hover);
+}
+
+.lang-switch:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+.lang-opt {
+  transition: color 0.2s ease;
+}
+
+.lang-opt.active {
+  color: var(--accent-cyan);
+}
+
+.lang-sep {
+  opacity: 0.4;
 }
 
 .nav-links a {
@@ -1184,6 +1251,8 @@ img, svg, canvas {
 
   .nav-links {
     position: fixed;
+    /* El panel es fixed: los margenes de desktop lo correrian de lugar */
+    margin: 0;
     top: 0;
     right: -100%;
     width: 78%;
@@ -1217,6 +1286,16 @@ img, svg, canvas {
     justify-content: center;
     min-width: 44px;
     min-height: 44px;
+  }
+
+  /* En mobile el hamburger tiene que quedar donde estaba */
+  .nav-actions {
+    margin-right: 0;
+  }
+
+  .lang-switch {
+    min-height: 36px;
+    padding: 7px 10px;
   }
 
   .nav-backdrop {

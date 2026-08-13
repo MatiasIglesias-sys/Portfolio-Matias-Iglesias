@@ -8,12 +8,20 @@
   const canvas = document.getElementById('playground');
   const ctx = canvas.getContext('2d');
 
+  // Capa aparte para la nave: al ser el cursor tiene que verse siempre,
+  // incluso sobre el navbar o las cards (el canvas de fondo va debajo de todo)
+  const shipCanvas = document.getElementById('ship-layer');
+  const shipCtx = shipCanvas.getContext('2d');
+
   // ── Deteccion de dispositivo ──
   // Touch: la nave se pilotea con toques en vez de seguir al cursor.
   const IS_TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   const IS_SMALL = window.innerWidth < 900;
   // En celular bajamos densidad de particulas y efectos caros (shadowBlur)
   const LOW_POWER = IS_TOUCH || IS_SMALL;
+  // Solo con mouse la nave hace de cursor: ahi va en la capa de arriba para
+  // que el navbar no la tape. En touch es decorativa y se queda en el fondo.
+  const SHIP_ON_TOP = !IS_TOUCH;
 
   // ── CONFIG ──
   const CFG = {
@@ -40,6 +48,7 @@
   let W, H, dpr, pageH;
   let mouse = { x: -9999, y: -9999, px: -9999, py: -9999, angle: 0, tx: null, ty: null };
   let running = true;
+  let rafId = null;
   let stars = [];
   let nebulae = [];
   let meteors = [];
@@ -64,6 +73,12 @@
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    shipCanvas.width = W * dpr;
+    shipCanvas.height = H * dpr;
+    shipCanvas.style.width = W + 'px';
+    shipCanvas.style.height = H + 'px';
+    shipCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   // ═══════════════════════════════════════════
@@ -689,7 +704,9 @@
   // SPACESHIP CURSOR
   // ═══════════════════════════════════════════
 
-  function drawShip() {
+  // Recibe su propio contexto: la nave se dibuja en la capa de arriba,
+  // no en el canvas de fondo
+  function drawShip(ctx) {
     if (!shipVisible) return;
 
     // Smooth angle toward travel direction
@@ -960,6 +977,7 @@
   }
 
   function animate() {
+    rafId = null;
     if (!running) return;
 
     updateShipTarget();
@@ -1073,13 +1091,29 @@
     // Lasers
     lasers.forEach(l => l.draw());
 
-    // Ship (on top of everything)
-    drawShip();
+    // Ship
+    if (SHIP_ON_TOP) shipCtx.clearRect(0, 0, W, H);
+    drawShip(SHIP_ON_TOP ? shipCtx : ctx);
 
     mouse.px = mouse.x;
     mouse.py = mouse.y;
 
-    requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
+  }
+
+  // Un unico frame pendiente a la vez. Sin esto, volver a la pestaña podia
+  // encolar un segundo loop y todo (meteoritos, disparos) iba al doble.
+  function startLoop() {
+    if (rafId !== null) return;
+    rafId = requestAnimationFrame(animate);
+  }
+
+  function stopLoop() {
+    running = false;
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
   }
 
   // ═══════════════════════════════════════════
@@ -1230,13 +1264,15 @@
     }, 250);
   });
 
-  // Pausa la animacion con la pestaña en segundo plano (bateria en celular)
+  // Pausa la animacion con la pestaña en segundo plano (bateria en celular).
+  // Al volver hay que cancelar el frame que quedo congelado antes de encolar
+  // otro, si no se acumulan loops y la escena corre a 2x, 3x...
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      running = false;
-    } else if (!running) {
+      stopLoop();
+    } else {
       running = true;
-      requestAnimationFrame(animate);
+      startLoop();
     }
   });
 
@@ -1255,17 +1291,19 @@
     shipVisible = true;
   }
 
-  animate();
+  startLoop();
 })();
 
 
 // ─── Typewriter Effect ──────────────────────────────────────────
 (function initTypewriter() {
   const el = document.getElementById('typewriter');
-  const words = ['Full-Stack', 'Frontend', 'Backend', 'de Software'];
+  const FALLBACK = ['Full-Stack', 'Frontend', 'Backend', 'de Software'];
+  let words = window.i18n ? window.i18n.roles() : FALLBACK;
   let wordIndex = 0;
   let charIndex = 0;
   let isDeleting = false;
+  let timer = null;
 
   function type() {
     const currentWord = words[wordIndex];
@@ -1288,8 +1326,20 @@
       delay = 500;
     }
 
-    setTimeout(type, delay);
+    timer = setTimeout(type, delay);
   }
+
+  // Al cambiar de idioma se reinicia con las palabras nuevas. Se limpia el
+  // timer pendiente para no terminar con dos ciclos escribiendo a la vez.
+  document.addEventListener('i18n:change', () => {
+    clearTimeout(timer);
+    words = window.i18n.roles();
+    wordIndex = 0;
+    charIndex = 0;
+    isDeleting = false;
+    el.textContent = '';
+    type();
+  });
 
   type();
 })();
@@ -1414,6 +1464,13 @@
   const toast = document.getElementById('toast');
   let toastTimer = null;
 
+  // Textos traducidos, con fallback en espanol si i18n no cargo
+  const ES = {
+    'toast.copied': 'Copiado: ',
+    'toast.error': 'No se pudo copiar, seleccionalo a mano',
+  };
+  const tr = (key) => (window.i18n ? window.i18n.t(key) : ES[key]);
+
   function showToast(msg) {
     if (!toast) return;
     toast.textContent = msg;
@@ -1462,9 +1519,9 @@
       if (ok) {
         btn.classList.add('copied');
         setTimeout(() => btn.classList.remove('copied'), 1600);
-        showToast('Copiado: ' + text);
+        showToast(tr('toast.copied') + text);
       } else {
-        showToast('No se pudo copiar, seleccionalo a mano');
+        showToast(tr('toast.error'));
       }
     });
   });
