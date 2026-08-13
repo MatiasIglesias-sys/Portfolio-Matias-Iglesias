@@ -177,6 +177,60 @@ img, svg, canvas {
   }
 }
 
+/* ─── Easter egg: contador de meteoritos ────── */
+/* Fijo contra el borde izquierdo, abajo del navbar: acompana el scroll.
+   El tono sigue al de la nave. */
+.meteor-counter {
+  --mc-hue: 205;
+  position: fixed;
+  top: calc(var(--nav-height) + 14px);
+  left: 40px;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: hsl(var(--mc-hue), 100%, 72%);
+  background: rgba(10, 10, 15, 0.55);
+  border: 1px solid hsla(var(--mc-hue), 100%, 60%, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.4s ease, transform 0.4s var(--ease-out),
+              color 0.5s ease, border-color 0.5s ease;
+}
+
+.meteor-counter.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mc-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.mc-count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cada 10 meteoritos: pulso al mismo tiempo que crece la nave */
+.meteor-counter.milestone {
+  animation: mc-pop 0.6s var(--ease-spring);
+}
+
+@keyframes mc-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
 /* ─── Navbar ─────────────────────────────────── */
 .navbar {
   position: fixed;
@@ -1291,6 +1345,13 @@ img, svg, canvas {
   /* En mobile el hamburger tiene que quedar donde estaba */
   .nav-actions {
     margin-right: 0;
+  }
+
+  /* Arriba a la izquierda se sentaria justo encima del texto del hero */
+  .meteor-counter {
+    top: auto;
+    bottom: 16px;
+    left: 16px;
   }
 
   .lang-switch {

@@ -59,6 +59,47 @@
   let ripples = [];
   let shipVisible = false;
 
+  // ═══════════════════════════════════════════
+  // EASTER EGG: contador de meteoritos rotos
+  // Cada 10 la nave crece x1.35 y cambia de color
+  // ═══════════════════════════════════════════
+
+  const GROWTH = 1.35;
+  // Tono (HSL) por escalon: nivel 0 arranca azul y a los 50 vuelve al azul
+  const TIERS = [205, 0, 145, 45, 275, 205]; // azul, rojo, verde, amarillo, morado, azul
+  const MAX_LEVEL = TIERS.length - 1;
+
+  let destroyed = 0;
+  let shipLevel = 0;
+  let shipScale = 1;       // se anima hacia shipScaleTarget
+  let shipScaleTarget = 1;
+  let shipHue = TIERS[0];
+
+  const hud = document.getElementById('meteor-counter');
+  const hudCount = hud && hud.querySelector('.mc-count');
+
+  function shipSize() { return CFG.shipSize * shipScale; }
+
+  function onMeteorDestroyed() {
+    destroyed++;
+    if (hudCount) hudCount.textContent = destroyed;
+    if (hud) hud.classList.add('show'); // recien aca aparece el contador
+
+    const level = Math.min(Math.floor(destroyed / 10), MAX_LEVEL);
+    if (level === shipLevel) return;
+
+    shipLevel = level;
+    shipHue = TIERS[level];
+    shipScaleTarget = Math.pow(GROWTH, level);
+
+    if (hud) {
+      hud.style.setProperty('--mc-hue', shipHue);
+      hud.classList.remove('milestone');
+      void hud.offsetWidth; // fuerza reflow para poder repetir la animacion
+      hud.classList.add('milestone');
+    }
+  }
+
   function rand(a, b) { return Math.random() * (b - a) + a; }
   function dist(x1, y1, x2, y2) { return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2); }
   function lerp(a, b, t) { return a + (b - a) * t; }
@@ -721,10 +762,11 @@
       mouse.angle += diff * 0.15;
     }
 
-    const s = CFG.shipSize;
+    const s = shipSize();
     const a = mouse.angle;
     const x = mouse.x;
     const y = mouse.y;
+    const h = shipHue; // cambia cada 10 meteoritos
 
     ctx.save();
     ctx.translate(x, y);
@@ -732,8 +774,8 @@
 
     // Engine glow (behind ship)
     const engineGrad = ctx.createRadialGradient(-s * 0.6, 0, 0, -s * 0.6, 0, s * 1.2);
-    engineGrad.addColorStop(0, 'rgba(0, 212, 255, 0.3)');
-    engineGrad.addColorStop(0.4, 'rgba(0, 150, 255, 0.1)');
+    engineGrad.addColorStop(0, `hsla(${h}, 100%, 50%, 0.3)`);
+    engineGrad.addColorStop(0.4, `hsla(${h}, 100%, 45%, 0.1)`);
     engineGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = engineGrad;
     ctx.beginPath();
@@ -747,7 +789,7 @@
     ctx.lineTo(-s * (0.9 + flicker * 0.4), 0);
     ctx.lineTo(-s * 0.4, s * 0.2);
     ctx.closePath();
-    ctx.fillStyle = `rgba(0, 220, 255, ${0.5 * flicker})`;
+    ctx.fillStyle = `hsla(${h}, 100%, 55%, ${0.5 * flicker})`;
     ctx.fill();
 
     // Inner flame
@@ -771,15 +813,15 @@
 
     // Hull gradient
     const hullGrad = ctx.createLinearGradient(-s * 0.5, -s * 0.5, s, s * 0.5);
-    hullGrad.addColorStop(0, '#2a3a5c');
-    hullGrad.addColorStop(0.4, '#4a5a7c');
-    hullGrad.addColorStop(0.7, '#3a4a6c');
-    hullGrad.addColorStop(1, '#1a2a4c');
+    hullGrad.addColorStop(0, `hsl(${h}, 37%, 26%)`);
+    hullGrad.addColorStop(0.4, `hsl(${h}, 25%, 39%)`);
+    hullGrad.addColorStop(0.7, `hsl(${h}, 30%, 33%)`);
+    hullGrad.addColorStop(1, `hsl(${h}, 49%, 20%)`);
     ctx.fillStyle = hullGrad;
     ctx.fill();
 
     // Hull outline
-    ctx.strokeStyle = 'rgba(100, 180, 255, 0.4)';
+    ctx.strokeStyle = `hsla(${h}, 100%, 70%, 0.4)`;
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -787,13 +829,13 @@
     ctx.beginPath();
     ctx.ellipse(s * 0.25, 0, s * 0.18, s * 0.1, 0, 0, Math.PI * 2);
     const cockpitGrad = ctx.createRadialGradient(s * 0.3, -s * 0.03, 0, s * 0.25, 0, s * 0.18);
-    cockpitGrad.addColorStop(0, 'rgba(120, 220, 255, 0.7)');
-    cockpitGrad.addColorStop(1, 'rgba(30, 100, 180, 0.4)');
+    cockpitGrad.addColorStop(0, `hsla(${h}, 100%, 74%, 0.7)`);
+    cockpitGrad.addColorStop(1, `hsla(${h}, 71%, 41%, 0.4)`);
     ctx.fillStyle = cockpitGrad;
     ctx.fill();
 
     // Wing details
-    ctx.strokeStyle = 'rgba(80, 150, 220, 0.2)';
+    ctx.strokeStyle = `hsla(${h}, 68%, 59%, 0.2)`;
     ctx.lineWidth = 0.5;
     ctx.beginPath();
     ctx.moveTo(s * 0.3, -s * 0.05);
@@ -880,8 +922,8 @@
     for (let i = 0; i < count; i++) {
       if (trail.length >= CFG.trailMax) break;
       const offset = rand(-4, 4);
-      const bx = mouse.x + Math.cos(backAngle) * CFG.shipSize * 0.5;
-      const by = mouse.y + Math.sin(backAngle) * CFG.shipSize * 0.5;
+      const bx = mouse.x + Math.cos(backAngle) * shipSize() * 0.5;
+      const by = mouse.y + Math.sin(backAngle) * shipSize() * 0.5;
       trail.push({
         x: bx + Math.cos(backAngle + Math.PI / 2) * offset,
         y: by + Math.sin(backAngle + Math.PI / 2) * offset,
@@ -945,6 +987,7 @@
         if (dist(l.x, l.y, m.x, mScreenY) < m.r + 6) {
           m.explode();
           playSound('explosion');
+          onMeteorDestroyed();
           l.life = 0;
           break;
         }
@@ -981,6 +1024,11 @@
     if (!running) return;
 
     updateShipTarget();
+
+    // La nave crece de a poco hasta el tamaño del escalon, no de un salto
+    if (Math.abs(shipScaleTarget - shipScale) > 0.001) {
+      shipScale += (shipScaleTarget - shipScale) * 0.08;
+    }
 
     ctx.fillStyle = CFG.bg;
     ctx.fillRect(0, 0, W, H);
@@ -1081,9 +1129,9 @@
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       if (p.type === 'hot') {
-        ctx.fillStyle = `rgba(200, 240, 255, ${p.life * 0.5})`;
+        ctx.fillStyle = `hsla(${shipHue}, 100%, 89%, ${p.life * 0.5})`;
       } else {
-        ctx.fillStyle = `rgba(0, 180, 255, ${p.life * 0.35})`;
+        ctx.fillStyle = `hsla(${shipHue}, 100%, 50%, ${p.life * 0.35})`;
       }
       ctx.fill();
     }
@@ -1146,15 +1194,15 @@
     const angle = Math.atan2(dy, dx);
     mouse.angle = angle; // apunta antes de disparar: el tiro sale derecho al toque
 
-    const noseX = mouse.x + Math.cos(angle) * CFG.shipSize;
-    const noseY = mouse.y + Math.sin(angle) * CFG.shipSize;
+    const noseX = mouse.x + Math.cos(angle) * shipSize();
+    const noseY = mouse.y + Math.sin(angle) * shipSize();
     lasers.push(new Laser(noseX, noseY, angle));
     lasers.push(new Laser(noseX, noseY, angle + rand(-0.1, 0.1)));
     playSound('laser');
     ripples.push(new Ripple(x, y));
 
     // Se acerca al punto pero frena antes, asi el dedo no tapa la nave
-    const stop = Math.max(0, d - CFG.shipSize * 3.5);
+    const stop = Math.max(0, d - shipSize() * 3.5);
     mouse.tx = clamp(mouse.x + Math.cos(angle) * stop, 24, W - 24);
     mouse.ty = clamp(mouse.y + Math.sin(angle) * stop, 24, H - 24);
   }
@@ -1170,8 +1218,8 @@
     document.addEventListener('mousedown', (e) => {
       initAudio(); // Desbloquea el audio en la primera interaccion
       if (shipVisible) {
-        const noseX = mouse.x + Math.cos(mouse.angle) * CFG.shipSize;
-        const noseY = mouse.y + Math.sin(mouse.angle) * CFG.shipSize;
+        const noseX = mouse.x + Math.cos(mouse.angle) * shipSize();
+        const noseY = mouse.y + Math.sin(mouse.angle) * shipSize();
         lasers.push(new Laser(noseX, noseY, mouse.angle));
         lasers.push(new Laser(noseX, noseY, mouse.angle + rand(-0.15, 0.15)));
         playSound('laser');
