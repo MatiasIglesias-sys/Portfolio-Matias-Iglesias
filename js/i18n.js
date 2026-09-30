@@ -64,6 +64,17 @@
       'projects.prog1': 'Programacion I - ORT',
       'projects.prog2': 'Programacion II - ORT',
 
+      'p.rosa.label': 'Cliente real - En desarrollo',
+      'p.rosa.subtitle': 'Control de turnos para una empresa de acompanantes de sanatorio',
+      'p.rosa.desc': 'Sistema para una empresa uruguaya con ~70 acompanantes que hoy lleva los turnos en una cuadernola. Asigna acompanantes a pacientes internados y hace imposible registrar turnos por encima de lo contratado o una misma persona en dos lugares a la vez. Arranque con el relevamiento con la duena y el alcance del MVP.',
+      'p.rosa.f1': 'Relevamiento con la clienta',
+      'p.rosa.f2': 'Reglas de negocio en la base',
+      'p.rosa.f3': 'Pensado para celular',
+
+      'p.hub.label': 'Arquitectura de Software en la Practica - ORT',
+      'p.hub.subtitle': 'Plataforma multi-tenant de eventos corporativos',
+      'p.hub.desc': 'Monolito modular en .NET listo para separarse en microservicios: gestion de eventos, registros con control de cupos y API publica para aplicaciones externas. Decisiones documentadas en ADRs, reglas de capas verificadas con tests de arquitectura y despliegue en AWS.',
+
       'p.tenant.label': 'Proyecto Destacado',
       'p.tenant.subtitle': 'Plataforma SaaS de gestion de alquileres',
       'p.tenant.desc': 'Sistema full-stack completo para el ciclo de vida de alquileres: publicacion de propiedades, postulaciones, contratos, seguimiento de pagos, calculo de IRPF uruguayo, chat entre partes y sistema de resenas con estrellas. Monorepo con arquitectura limpia y seguridad de nivel produccion (Helmet, rate limiting, JWT rotation, bcrypt).',
@@ -181,6 +192,17 @@
       'projects.site': 'View website',
       'projects.prog1': 'Programming I - ORT',
       'projects.prog2': 'Programming II - ORT',
+
+      'p.rosa.label': 'Real client - In progress',
+      'p.rosa.subtitle': 'Shift management for a hospital companion company',
+      'p.rosa.desc': 'System for a Uruguayan company with ~70 hospital companions that currently tracks shifts in a paper notebook. It assigns companions to hospitalized patients and makes it impossible to record more shifts than contracted, or the same person in two places at once. I started with requirements gathering with the owner and the MVP scope.',
+      'p.rosa.f1': 'Requirements gathering with the client',
+      'p.rosa.f2': 'Business rules enforced in the database',
+      'p.rosa.f3': 'Mobile-first',
+
+      'p.hub.label': 'Software Architecture in Practice - ORT',
+      'p.hub.subtitle': 'Multi-tenant corporate events platform',
+      'p.hub.desc': 'Modular monolith in .NET ready to be split into microservices: event management, registrations with capacity control and a public API for external applications. Decisions documented in ADRs, layer rules verified by architecture tests, and deployment on AWS.',
 
       'p.tenant.label': 'Featured Project',
       'p.tenant.subtitle': 'Rental management SaaS platform',
